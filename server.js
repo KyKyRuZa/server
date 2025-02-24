@@ -26,8 +26,10 @@ const startServer = async () => {
     console.log('PostgreSQL подключен');
     await sequelize.sync(); 
     const PORT = process.env.PORT || 6000
+    const IP = process.env.DB_HOST || 'localhost'
+    const DBPORT = process.env.DB_PORT || 5432
     app.listen(PORT, () => {
-      console.log(`Сервер запущен на порту ${PORT}`);
+      console.log(`Сервер запущен на порту ${PORT} и IP ${IP}:${DBPORT}`);
     });
   } catch (error) {
     console.error('Ошибка подключения к базе данных:', error);
