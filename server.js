@@ -1,3 +1,5 @@
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./database');
@@ -8,6 +10,11 @@ const basket = require('./routes/basket');
 require('dotenv').config();
 
 const app = express();
+// HTTPS сервер
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/delron.ru/privkey.pem'), // Приватный ключ
+  cert: fs.readFileSync('/etc/letsencrypt/live/delron.ru/fullchain.pem') // Сертификат
+};
 
 // Middleware
 app.use(cors());
@@ -24,12 +31,10 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('PostgreSQL подключен');
-    await sequelize.sync(); 
+    await sequelize.sync();
     const PORT = process.env.PORT || 6000
-    const IP = process.env.DB_HOST || 'localhost'
-    const DBPORT = process.env.DB_PORT || 5432
-    app.listen(PORT, () => {
-      console.log(`Сервер запущен на порту ${PORT} и IP ${IP}:${DBPORT}`);
+    https.createServer(options, app).listen(PORT, () => {
+      console.log(`HTTPS Сервер запущен на порту ${PORT}`);
     });
   } catch (error) {
     console.error('Ошибка подключения к базе данных:', error);
@@ -37,3 +42,4 @@ const startServer = async () => {
 };
 
 startServer();
+
