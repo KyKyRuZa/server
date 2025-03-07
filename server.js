@@ -6,9 +6,26 @@ const sequelize = require('./database');
 const auth = require('./routes/auth');
 const product = require('./routes/product');
 const basket = require('./routes/basket');
+const WebSocket = require('ws');
 
 require('dotenv').config();
 
+const wss = new WebSocket.Server({ server });
+wss.on('connection', (ws) => {
+  console.log('Клиент подключен');
+
+  ws.on('message', (message) => {
+      console.log(`Получено сообщение: ${message}`);
+      // Здесь вы можете обработать сообщение и отправить ответ
+      ws.send('Сообщение получено');
+  });
+
+  // Пример отправки обновлений клиенту
+  setInterval(() => {
+      const updatedUser = { /* ваши данные пользователя */ };
+      ws.send(JSON.stringify(updatedUser));
+  }, 5000); // Отправка обновлений каждые 5 секунд
+});
 const app = express();
 // HTTPS сервер
 const options = {
