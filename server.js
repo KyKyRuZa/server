@@ -10,28 +10,30 @@ const WebSocket = require('ws');
 
 require('dotenv').config();
 
-const wss = new WebSocket.Server({ server });
-wss.on('connection', (ws) => {
-  console.log('Клиент подключен');
-
-  ws.on('message', (message) => {
-      console.log(`Получено сообщение: ${message}`);
-      // Здесь вы можете обработать сообщение и отправить ответ
-      ws.send('Сообщение получено');
-  });
-
-  // Пример отправки обновлений клиенту
-  setInterval(() => {
-      const updatedUser = { /* ваши данные пользователя */ };
-      ws.send(JSON.stringify(updatedUser));
-  }, 5000); // Отправка обновлений каждые 5 секунд
-});
 const app = express();
-// HTTPS сервер
+
 const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/delron.ru/privkey.pem'), // Приватный ключ
-  cert: fs.readFileSync('/etc/letsencrypt/live/delron.ru/fullchain.pem') // Сертификат
+  key: fs.readFileSync('/etc/letsencrypt/live/delron.ru/privkey.pem'), // Private key
+  cert: fs.readFileSync('/etc/letsencrypt/live/delron.ru/fullchain.pem') // Certificate
 };
+
+const server = https.createServer(options, app);
+
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+
+    ws.on('message', (message) => {
+        console.log(`Received message: ${message}`);
+        ws.send('Message received');
+    });
+
+    setInterval(() => {
+        const updatedUser = { /* your user data */ };
+        ws.send(JSON.stringify(updatedUser));
+    }, 5000);
+});
 
 // Middleware
 app.use(cors());
@@ -43,20 +45,19 @@ app.use('/api/', product);
 app.use('/uploads', express.static('uploads'));
 app.use('/api/', basket);
 
-// Запуск сервера
+// Start the server
 const startServer = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('PostgreSQL подключен');
-    await sequelize.sync();
-    const PORT = process.env.PORT || 6000
-    https.createServer(options, app).listen(PORT, () => {
-      console.log(`HTTPS Сервер запущен на порту ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Ошибка подключения к базе данных:', error);
-  }
+    try {
+        await sequelize.authenticate();
+        console.log('PostgreSQL connected');
+        await sequelize.sync();
+        const PORT = process.env.PORT || 6000;
+        server.listen(PORT, () => {
+            console.log(`HTTPS Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Database connection error:', error);
+    }
 };
 
 startServer();
-
