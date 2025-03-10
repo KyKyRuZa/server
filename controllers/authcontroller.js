@@ -78,39 +78,4 @@ const authController = {
     }
 };
 
-const userController = {
-  async createUser(req, res) {
-    try {
-      const { username, email, password, firstName, lastName, bio } = req.body;
-      const user = await User.create({
-        username,
-        email,
-        password,
-        firstName,
-        lastName,
-        bio
-      });
-      res.status(201).json(user);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-  async getUser(req, res) {
-    try {
-      const user = await User.findByPk(req.params.id);
-      if (!user) {
-        return res.status(404).json({ message: 'Пользователь не найден' });
-      }
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-};
-
-module.exports = {
-  register: authController.register,
-  login: authController.login,
-  createUser: userController.createUser,
-  getUser: userController.getUser
-};
+module.exports = authController;

@@ -8,5 +8,4 @@ router.put('/profile/increment', basketController.incrementQuantity);
 router.put('/profile/decrement', basketController.decrementQuantity);
 router.delete('/profile/:userId/:productId', basketController.removeFromBasket);
 
-
 module.exports = router;
