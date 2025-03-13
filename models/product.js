@@ -5,14 +5,14 @@ const Product = sequelize.define('Product', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
     },
     imageUrl: {
         type: DataTypes.STRING,
         allowNull: true
     },
     name: {
-        type: DataTypes.STRING(100), 
+        type: DataTypes.STRING(100),
         allowNull: false,
         validate: {
             notEmpty: true,
@@ -21,13 +21,12 @@ const Product = sequelize.define('Product', {
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true
     },
     price: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            isFloat: true,
             min: 0 
         }
     },
@@ -39,20 +38,32 @@ const Product = sequelize.define('Product', {
             min: 1
         }
     },
+    category: {
+        type: DataTypes.ENUM(
+            'Отсутствует',
+            'Авто краски',
+            'Аэрозольные краски',
+            'Аэрозольные краски RAL/NCS/PANTONE',
+            'Термостойкие краски',
+            'Автоэмаль с кисточкой',
+            'Аэрозольные лаки',
+            'Аэрозольные грунты'
+        ),
+        defaultValue: 'Отсутствует',
+        allowNull: false 
+    },
     status: {
-        type: DataTypes.ENUM('pending', 'completed', 'cancelled'),
-        defaultValue: 'pending',
-        allowNull: false,
+        type: DataTypes.ENUM('Ожидание', 'Закончено', 'Отменено'),
+        defaultValue: 'Ожидание',
+        allowNull: false
     },
     paymentStatus: {
-        type: DataTypes.ENUM('pending', 'paid', 'failed'),
-        defaultValue: 'pending',
+        type: DataTypes.ENUM('Ожидание', 'Оплачено', 'Ошибка'),
+        defaultValue: 'Ожидание'
     }
 }, {
-    timestamps: true, // Automatically manage createdAt and updatedAt fields
-    paranoid: true, // Enable soft deletes (deletedAt field)
+    timestamps: true,
+    paranoid: true
 });
-
-// Optional: Define instance methods or static methods here if needed
 
 module.exports = Product;

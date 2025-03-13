@@ -18,14 +18,15 @@ const productController = {
     
     async createProduct(req, res) {
         try {   
-            const { name, description, price } = req.body;
-            const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+            const {  name, description, price, category } = req.body;
+            const imageUrl = req.file ? `https://delron.ru/uploads/${req.file.filename}` : null;
 
             const newProduct = await Product.create({
                 name,
+                imageUrl,
                 description,
                 price,
-                imageUrl
+                category,
             });
 
             res.status(200).json(newProduct);
@@ -34,25 +35,20 @@ const productController = {
             res.status(400).json({ error: 'Error adding product' });
         }
     },
-
-    async getAllProducts(req, res) {
+    async updateProduct(req, res) {
         try {
-            const products = await Product.findAll({
-                attributes: ['id', 'name', 'description', 'price', 'status', 'paymentStatus', 'imageUrl'],
-                order: [['createdAt', 'DESC']]
-            }); 
-    
-            if (products.length === 0) {
-                return res.status(404).json({ message: 'Товары не найдены' });
+            const { id } = req.params;
+            const updates = req.body;
+            
+            const product = await Product.findByPk(id);
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
             }
-    
-            res.status(200).json(products);
+
+            await product.update(updates);
+            return res.status(200).json(product);
         } catch (error) {
-            console.error('Ошибка при получении продуктов:', error);
-            res.status(500).json({ 
-                error: 'Ошибка при получении продуктов',
-                details: error.message 
-            });
+            return res.status(500).json({ message: error.message });
         }
     },
     async deleteProduct(req, res) {
@@ -67,33 +63,26 @@ const productController = {
             res.status(500).json({ error: 'Ошибка при удалении продукта' });
         }
     },
-    async editProduct(req, res) {
+    async getAllProducts(req, res) {
         try {
-            const { id } = req.params;
-            const { name, description, price, status, paymentStatus } = req.body;
-
-            const product = await Product.findByPk(id);
-
-            if (!product) {
-                return res.status(404).json({ error: 'Продукт не найден' });
+            const products = await Product.findAll(); 
+    
+            if (products.length === 0) {
+                return res.status(404).json({ message: 'Товары не найдены' });
             }
-
-            product.name = name;
-            product.description = description;
-            product.price = price;
-            product.status = status;
-            product.paymentStatus = paymentStatus;
-
-            await product.save();
-
-            res.status(200).json(product);
+    
+            res.status(200).json(products);
         } catch (error) {
-            console.error('Ошибка при редактировании продукта:', error);
-            res.status(500).json({ error: 'Ошибка при редактировании продукта' });
+            console.error('Ошибка при получении продуктов:', error);
+            res.status(500).json({ 
+                error: 'Ошибка при получении продуктов',
+                details: error.message 
+            });
         }
-    }
+    },
+    
+    
     
 };
-
 
 module.exports = productController;
