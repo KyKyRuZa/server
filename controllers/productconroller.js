@@ -3,15 +3,15 @@ const path = require('path');
 const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
+    destination: function (req, file, cb) {
+      cb(null, '/var/www/uploads/'); // Новая директория
     },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname); // Имя файла
     }
-});
+  });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 const productController = {
     uploadImage: upload.single('image'),
