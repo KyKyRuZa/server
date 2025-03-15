@@ -31,24 +31,34 @@ const productController = {
 
             res.status(200).json(newProduct);
         } catch (error) {
-            console.error('Error adding product:', error);
-            res.status(400).json({ error: 'Error adding product' });
+            console.error('Ошибка добавления товара:', error);
+            res.status(400).json({ error: 'Ошибка добавления товара' });
         }
     },
     async updateProduct(req, res) {
         try {
             const { id } = req.params;
-            const updates = req.body;
-            
-            const product = await Product.findByPk(id);
-            if (!product) {
-                return res.status(404).json({ message: 'Product not found' });
+            const { name, description, price, category } = req.body;
+            const imageUrl = req.file ? `https://delron.ru/uploads/${req.file.filename}` : null;
+    
+            const [updated] = await Product.update({
+                name,
+                description,
+                price,
+                category,
+                ...(imageUrl && { imageUrl })
+            }, {
+                where: { id }
+            });
+    
+            if (updated) {
+                const updatedProduct = await Product.findByPk(id);
+                return res.status(200).json(updatedProduct);
             }
-
-            await product.update(updates);
-            return res.status(200).json(product);
+            return res.status(404).json({ message: 'Продукт не найден' });
+            
         } catch (error) {
-            return res.status(500).json({ message: error.message });
+            res.status(500).json({ message: 'Ошибка при обновлении продукта' });
         }
     },
     async deleteProduct(req, res) {
