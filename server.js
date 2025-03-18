@@ -6,6 +6,8 @@ const sequelize = require('./database');
 const auth = require('./routes/auth');
 const product = require('./routes/product');
 const basket = require('./routes/basket');
+const profile = require('./routes/profile');
+
 const WebSocket = require('ws');
 
 require('dotenv').config();
@@ -43,6 +45,7 @@ app.use(express.json());
 app.use('/api/auth', auth);
 app.use('/api/profile', product);
 app.use('/api/profile', basket);
+app.use('/api/profile', profile);
 app.use('/uploads', express.static('/var/www/uploads/'));
 
 // Start the server
