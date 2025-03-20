@@ -9,6 +9,8 @@ const crypto = require('crypto');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
@@ -93,9 +95,9 @@ const authController = {
                 `
             });
 
-            res.json({ message: 'Reset email sent' });
+            res.json({ message: 'Письмо успешно отправлено!' });
         } catch (error) {
-            console.error('Reset email error:', error);
+            console.error('Ошибка при отправке письма:', error);
             res.status(500).json({ message: error.message });
         }
     },
