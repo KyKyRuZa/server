@@ -42,8 +42,8 @@ const User = sequelize.define('User', {
     },
     
     status: {
-        type: DataTypes.ENUM('активыный', 'не активный', 'удаленный'),
-        defaultValue: 'активыный'
+        type: DataTypes.ENUM('активный', 'не активный', 'удаленный'),
+        defaultValue: 'активный'
     },
 
     phone: {
@@ -62,21 +62,28 @@ const User = sequelize.define('User', {
     lastLogin: {
         type: DataTypes.DATE,
         allowNull: true
+    },
+    resetToken: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    resetTokenExpiry: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 }, {
-    // Дополнительные опции модели
-    timestamps: true, // Создает поля createdAt и updatedAt
-    paranoid: true,  // Мягкое удаление (создает поле deletedAt)
+    timestamps: true, 
+    paranoid: true,
 });
 
-// Методы экземпляра
+
 User.prototype.toJSON = function() {
     const values = { ...this.get() };
-    delete values.password; // Удаляем пароль из ответа
+    delete values.password;
     return values;
 };
 
-// Статические методы
+
 User.findByEmail = async function(email) {
     return await this.findOne({ where: { email } });
 };

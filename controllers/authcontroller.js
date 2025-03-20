@@ -1,7 +1,19 @@
+require('dotenv').config();
+const { Op } = require('sequelize');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 
 const authController = {
     async register(req, res) {
@@ -36,6 +48,88 @@ const authController = {
             });
         }
     },
+    async checkEmail(req, res) {
+        try {
+            const user = await User.findOne({
+                where: { email: req.body.email }
+            });
+            res.json({ exists: !!user });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    async sendResetEmail(req, res) {
+        try {
+            const user = await User.findOne({
+                where: { email: req.body.email }
+            });
+            
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            await user.update({
+                resetToken: resetToken,
+                resetTokenExpiry: new Date(Date.now() + 900000)
+            });
+
+            const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+            
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: 'Восстановление пароля',
+                html: `
+                    <h2>Восстановление пароля</h2>
+                    <p>Здравствуйте!</p>
+                    <p>Вы получили это письмо, так как был запрошен сброс пароля для вашей учетной записи. Для завершения процедуры восстановления пароля, пожалуйста, перейдите по ссылке ниже:</p>
+                    <a href="${resetLink}" class="reset-link">Сбросить пароль</a>
+                    <p>Внимание! Данная ссылка действительна только в течение <strong>15 минут</strong>. Если вы не запрашивали сброс пароля, просто проигнорируйте это письмо.</p>
+                    <div>
+                        <p>С уважением,<br>Команда поддержки ООО "DELRON"</p>
+                    </div>
+                `
+            });
+
+            res.json({ message: 'Reset email sent' });
+        } catch (error) {
+            console.error('Reset email error:', error);
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    async resetPassword(req, res) {
+        try {
+            const user = await User.findOne({
+                where: {
+                    resetToken: req.body.token,
+                    resetTokenExpiry: {
+                        [Op.gt]: new Date()
+                    }
+                }
+            });
+    
+            if (!user) {
+                return res.status(400).json({ message: 'Invalid or expired token' });
+            }
+    
+            const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
+            
+            await user.update({
+                password: hashedPassword,
+                resetToken: null,
+                resetTokenExpiry: null
+            });
+    
+            res.json({ message: 'Password updated successfully' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+    
+
     async login(req, res) {
         try {
             const { email, password } = req.body;
