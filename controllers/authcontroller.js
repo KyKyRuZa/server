@@ -8,7 +8,7 @@ const crypto = require('crypto');
 
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.mail.ru',
+    host: 'emx.mail.ru',
     port: 465,
     secure: true,
     auth: {
