@@ -8,14 +8,16 @@ const crypto = require('crypto');
 
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false,
+    host: 'smtp.delron.ru',
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
     },
     connectionTimeout: 60000,
+    debug: true, 
+    logger: true
 });
 transporter.verify((error, success) => {
     if (error) {
