@@ -17,7 +17,13 @@ const transporter = nodemailer.createTransport({
     },
     connectionTimeout: 60000,
 });
-
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('Error verifying SMTP connection:', error);
+    } else {
+        console.log('SMTP connection verified');
+    }
+});
 const authController = {
     async register(req, res) {
         try {
