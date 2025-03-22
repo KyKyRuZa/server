@@ -19,13 +19,6 @@ const transporter = nodemailer.createTransport({
     debug: true, 
     logger: true
 });
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('Error verifying SMTP connection:', error);
-    } else {
-        console.log('SMTP connection verified');
-    }
-});
 const authController = {
     async register(req, res) {
         try {
