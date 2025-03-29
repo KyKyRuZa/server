@@ -42,8 +42,8 @@ const User = sequelize.define('User', {
     },
     
     status: {
-        type: DataTypes.ENUM('активный', 'не активный', 'удаленный'),
-        defaultValue: 'активный'
+        type: DataTypes.ENUM('active', 'inactive', 'deleted'),
+        defaultValue: 'active'
     },
 
     phone: {
@@ -55,8 +55,8 @@ const User = sequelize.define('User', {
     },
     
     role: {
-        type: DataTypes.ENUM(['пользователь', 'администратор']),
-        defaultValue: 'пользователь'
+        type: DataTypes.ENUM(['user', 'admin']),
+        defaultValue: 'user'
     },
     
     lastLogin: {
