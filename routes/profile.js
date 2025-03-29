@@ -8,6 +8,4 @@ router.put('/password/:userId', authMiddleware, profileController.updatePassword
 router.get('/:userId', authMiddleware, profileController.getProfile);
 router.put('/personal/:userId', authMiddleware, profileController.updatePersonalInfo);
 
-
-
 module.exports = router;

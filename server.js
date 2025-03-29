@@ -8,8 +8,6 @@ const product = require('./routes/product');
 const basket = require('./routes/basket');
 const profile = require('./routes/profile');
 
-const WebSocket = require('ws');
-
 require('dotenv').config();
 
 const app = express();
@@ -20,32 +18,15 @@ const options = {
 };
 
 const server = https.createServer(options, app);
-
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (ws) => {
-    console.log('Client connected');
-
-    ws.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-        ws.send('Message received');
-    });
-
-    setInterval(() => {
-        const updatedUser = { /* your user data */ };
-        ws.send(JSON.stringify(updatedUser));
-    }, 5000);
-});
-
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', auth);
-app.use('/api/profile', product);
-app.use('/api/profile', basket);
-app.use('/api/profile', profile);
+app.use('/api/profile/admin-catalog', product);
+app.use('/api/profile/basket', basket);
+app.use('/api/profile/settings', profile);
 app.use('/uploads', express.static('/var/www/uploads/'));
 
 // Start the server
