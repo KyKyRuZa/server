@@ -3,6 +3,7 @@ const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./database');
+
 const auth = require('./routes/auth');
 const product = require('./routes/product');
 const basket = require('./routes/basket');
