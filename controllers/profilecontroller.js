@@ -1,3 +1,4 @@
+const Product = require('../models/product'); 
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 
@@ -92,7 +93,37 @@ const profileController = {
         } catch (error) {
             res.status(500).json({ message: "Ошибка при получении профиля" });
         }
+    },
+    async getStatistics(req, res) {
+        try {
+            const totalProducts = await Product.count();
+            const totalUsers = await User.count();
+            const totalOrders = 0; 
+            const totalRevenue = 0;
+            
+            res.json({
+                totalProducts,
+                totalUsers,
+                totalOrders,
+                totalRevenue
+            });
+        } catch (error) {
+            res.status(500).json({ message: "Ошибка при получении статистики" });
+        }
+    },
+    async getAllUsers(req, res) {
+        try {
+            const users = await User.findAll({
+                attributes: ['id', 'firstName', 'lastName', 'email', 'role', 'createdAt'],
+                order: [['id', 'ASC']]
+            });
+            res.json(users);
+        } catch (error) {
+            console.log('Error in getAllUsers:', error);
+            res.status(500).json({ message: "Ошибка при получении списка пользователей" });
+        }
     }
+
 };
 
 module.exports = profileController;

@@ -3,29 +3,30 @@ const path = require('path');
 const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, '/var/www/uploads/'); // Новая директория
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
     },
-    filename: function (req, file, cb) {
-      cb(null, Date.now() + '-' + file.originalname); // Имя файла
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
     }
-  });
+});
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 const productController = {
     uploadImage: upload.single('image'),
     
     async createProduct(req, res) {
         try {   
-            const {  name, description, price, category } = req.body;
-            const imageUrl = req.file ? `https://delron.ru/uploads/${req.file.filename}` : null;
+            const {  name, description, price, quantity, category } = req.body;
+            const imageUrl = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : null;
 
             const newProduct = await Product.create({
                 name,
                 imageUrl,
                 description,
                 price,
+                quantity,
                 category,
             });
 
@@ -38,13 +39,14 @@ const productController = {
     async updateProduct(req, res) {
         try {
             const { id } = req.params;
-            const { name, description, price, category } = req.body;
-            const imageUrl = req.file ? `https://delron.ru/uploads/${req.file.filename}` : null;
+            const { name, description, price, quantity, category } = req.body;
+            const imageUrl = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : null;
     
             const [updated] = await Product.update({
                 name,
                 description,
                 price,
+                quantity,
                 category,
                 ...(imageUrl && { imageUrl })
             }, {

@@ -57,10 +57,6 @@ const Product = sequelize.define('Product', {
         defaultValue: 'Ожидание',
         allowNull: false
     },
-    paymentStatus: {
-        type: DataTypes.ENUM('Ожидание', 'Оплачено', 'Ошибка'),
-        defaultValue: 'Ожидание'
-    }
 }, {
     timestamps: true,
     paranoid: true

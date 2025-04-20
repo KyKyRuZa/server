@@ -10,7 +10,13 @@ const basketController = {
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }
+            const existingBasketItem = await Basket.findOne({
+                where: { userId, productId }
+            });
 
+            if (existingBasketItem) {
+                return res.status(400).json({ message: 'Product already exists in basket' });
+            }
             const totalAmount = product.price * quantity;
 
             const basketItem = await Basket.create({

@@ -27,7 +27,7 @@ app.use(express.json());
 app.use('/api/auth', auth);
 app.use('/api/profile/admin-catalog', product);
 app.use('/api/profile/basket', basket);
-app.use('/api/profile/settings', profile);
+app.use('/api/profile', profile);
 app.use('/uploads', express.static('/var/www/uploads/'));
 
 // Start the server
